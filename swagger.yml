@@ -1,0 +1,163 @@
+# swagger.yml
+
+openapi: 3.0.0
+info:
+  title: "RP Flask REST API"
+  description: "An API about users and trails"
+  version: "1.0.0"
+
+servers:
+  - url: "/api"
+
+components:
+  schemas:
+    User:
+      type: "object"
+      required:
+        - lname
+      properties:
+        fname:
+          type: "string"
+        lname:
+          type: "string"
+  parameters:
+    lname:
+      name: "lname"
+      description: "Last name of the user to get"
+      in: path
+      required: True
+      schema:
+        type: "string"
+    trail_id:
+      name: "trail_id"
+      description: "ID of the trail"
+      in: path
+      required: true
+      schema:
+        type: "integer"
+
+paths:
+  /users:
+    get:
+      operationId: "users.read_all"
+      tags:
+        - "Users"
+      summary: "Read the list of users"
+      responses:
+        "200":
+          description: "Successfully read users list"
+    post:
+      operationId: "users.create"
+      tags:
+        - Users
+      summary: "Create a user"
+      requestBody:
+          description: "User to create"
+          required: True
+          content:
+            application/json:
+              schema:
+                x-body-name: "user"
+                $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: "Successfully created user"
+  /users/{lname}:
+    get:
+      operationId: "users.read_one"
+      tags:
+        - Users
+      summary: "Read one user"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "200":
+          description: "Successfully read user"
+    put:
+      tags:
+        - Users
+      operationId: "users.update"
+      summary: "Update a user"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "200":
+          description: "Successfully updated user"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              x-body-name: "user"
+              $ref: "#/components/schemas/User"
+    delete:
+      tags:
+        - Users
+      operationId: "users.delete"
+      summary: "Delete a user"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "204":
+          description: "Successfully deleted user"
+  /trails:
+    post:
+      operationId: "trails.create"
+      tags:
+        - Trails
+      summary: "Create a traul associated with a user"
+      requestBody:
+          description: "Trail to create"
+          required: True
+          content:
+            application/json:
+              schema:
+                x-body-name: "trail"
+                type: "object"
+                properties:
+                  user_id:
+                    type: "integer"
+                  content:
+                    type: "string"
+      responses:
+        "201":
+          description: "Successfully created a trail"
+  /trails/{trail_id}:
+    get:
+      operationId: "trails.read_one"
+      tags:
+        - Trails
+      summary: "Read one trail"
+      parameters:
+        - $ref: "#/components/parameters/trail_id"
+      responses:
+        "200":
+          description: "Successfully read one trail"
+    put:
+      tags:
+        - Trails
+      operationId: "trails.update"
+      summary: "Update a trail"
+      parameters:
+        - $ref: "#/components/parameters/trail_id"
+      responses:
+        "200":
+          description: "Successfully updated trail"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              x-body-name: "trail"
+              type: "object"
+              properties:
+                content:
+                  type: "string"
+    delete:
+      tags:
+        - Trails
+      operationId: "trails.delete"
+      summary: "Delete a trail"
+      parameters:
+        - $ref: "#/components/parameters/trail_id"
+      responses:
+        "204":
+          description: "Successfully deleted trail"
