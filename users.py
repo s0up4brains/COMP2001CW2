@@ -39,6 +39,9 @@ def update(lname, user):
     if existing_user:
         update_user = user_schema.load(user, session=db.session)
         existing_user.fname = update_user.fname
+        existing_user.lname = update_user.lname
+        existing_user.email = update_user.email
+        existing_user.password = update_user.password
         db.session.merge(existing_user)
         db.session.commit()
         return user_schema.dump(existing_user), 201

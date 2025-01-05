@@ -2,7 +2,7 @@
 
 openapi: 3.0.0
 info:
-  title: "RP Flask REST API"
+  title: "Trails REST API Microservice"
   description: "An API about users and trails"
   version: "1.0.0"
 
@@ -19,6 +19,23 @@ components:
         fname:
           type: "string"
         lname:
+          type: "string"
+        password:
+          type: "string"
+        email:
+          type: "string"
+    Trail:
+      type: "object"
+      required:
+        - lname
+      properties:
+        fname:
+          type: "string"
+        lname:
+          type: "string"
+        password:
+          type: "string"
+        email:
           type: "string"
   parameters:
     lname:
@@ -104,7 +121,7 @@ paths:
       operationId: "trails.create"
       tags:
         - Trails
-      summary: "Create a traul associated with a user"
+      summary: "Create a trail associated with a user"
       requestBody:
           description: "Trail to create"
           required: True

@@ -3,7 +3,7 @@
 from flask import render_template
 
 import config
-from models import User
+from models import User, Trail
 
 
 app = config.connex_app
