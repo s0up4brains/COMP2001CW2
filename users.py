@@ -6,11 +6,6 @@ from config import db
 from models import User, users_schema, user_schema
 
 
-def read_all():
-    users = User.query.all()
-    return users_schema.dump(users)
-
-
 def create(user):
     lname = user.get("lname")
     existing_user = User.query.filter(User.lname == lname).one_or_none()
@@ -23,6 +18,10 @@ def create(user):
     else:
         abort(406, f"User with last name {lname} already exists")
 
+
+def read_all():
+    users = User.query.all()
+    return users_schema.dump(users)
 
 def read_one(lname):
     user = User.query.filter(User.lname == lname).one_or_none()

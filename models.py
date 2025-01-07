@@ -1,10 +1,19 @@
 # models.py
 
-import pytz
 from datetime import datetime
 from marshmallow_sqlalchemy import fields
 
+from sqlalchemy import Table, Column, Integer, ForeignKey
+
 from config import db, ma
+
+    #join table trail->tags
+Trail_Tags = db.Table(
+  'Trail_Tags',
+  db.metadata,
+  db.Column('TrailID', db.Integer, db.ForeignKey('TrailID')),
+  db.Column('TagID', db.Integer, db.ForeignKey('TagID'))
+)
 
 #route
 class Route(db.Model):
@@ -34,6 +43,7 @@ class Difficulty(db.Model):
 
 class DifficultySchema(ma.SQLAlchemyAutoSchema):
     class Meta:
+        
         model = Difficulty
         load_instance = True
         sqla_session = db.session
@@ -51,7 +61,7 @@ class Description(db.Model):
     Trail_Location = db.Column(db.String, nullable=False)
     RouteID = db.Column(db.Integer, nullable=False)
     DifficultyID = db.Column(db.Integer, nullable=False)
-
+  
 class DescriptionSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Description
@@ -68,6 +78,8 @@ class Tag(db.Model):
     Tag_Name = db.Column(db.String(50))
     Tag_Type = db.Column(db.String(50))
 
+    #Trail = db.relationship('Trail', secondary = 'Trail_Tags', backref= 'Tags' )
+    
 class TagSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Tag
@@ -101,10 +113,10 @@ class Trail(db.Model):
     __table_args__ = {'schema': 'CW2'}
     TrailID = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('CW2.User.id'))
-    content = db.Column(db.String, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     Rating = db.Column(db.Numeric)
     DescriptionID = db.Column(db.Integer, db.ForeignKey('CW2.Description.DescriptionID'))
+
+   # Tags = db.relationship('Tags', secondary = 'Trail_Tags', backref = 'Trail')
 
 class TrailSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
@@ -112,6 +124,8 @@ class TrailSchema(ma.SQLAlchemyAutoSchema):
         load_instance = True
         sqla_session = db.session
         include_fk = True
+        
+        ma.Nested("DescriptionSchema")
 
 
 # trail_log
@@ -146,9 +160,16 @@ class TrailTagsSchema(ma.SQLAlchemyAutoSchema):
         include_fk = True
 
 
+
+
     trails = fields.Nested(TrailSchema, many=True)
+    
+
 
 trail_schema = TrailSchema()
-users_schema = TrailSchema(many=True)
+trails_schema = TrailSchema(many=True)
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
+
+
+

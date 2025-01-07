@@ -26,17 +26,20 @@ components:
           type: "string"
     Trail:
       type: "object"
-      required:
-        - lname
+      # required:
+      #   - TrailID
       properties:
-        fname:
-          type: "string"
-        lname:
-          type: "string"
-        password:
-          type: "string"
-        email:
-          type: "string"
+        Rating:
+          type: "number" 
+          format: "float"
+        DescriptionID:
+          type: "integer"
+        user_id:
+          type: "integer"
+        Description:
+          type: "string"  
+
+
   parameters:
     lname:
       name: "lname"
@@ -45,8 +48,8 @@ components:
       required: True
       schema:
         type: "string"
-    trail_id:
-      name: "trail_id"
+    TrailID:
+      name: "TrailID"
       description: "ID of the trail"
       in: path
       required: true
@@ -116,12 +119,22 @@ paths:
       responses:
         "204":
           description: "Successfully deleted user"
+
+
   /trails:
+    get:
+      operationId: "trails.read_all"
+      tags:
+        - "Trails"
+      summary: "Read the list of trails"
+      responses:
+        "200":
+          description: "Successfully read trails list"
     post:
       operationId: "trails.create"
       tags:
         - Trails
-      summary: "Create a trail associated with a user"
+      summary: "Create a trail"
       requestBody:
           description: "Trail to create"
           required: True
@@ -129,33 +142,28 @@ paths:
             application/json:
               schema:
                 x-body-name: "trail"
-                type: "object"
-                properties:
-                  user_id:
-                    type: "integer"
-                  content:
-                    type: "string"
+                $ref: "#/components/schemas/Trail"
       responses:
         "201":
-          description: "Successfully created a trail"
-  /trails/{trail_id}:
+          description: "Successfully created trail"
+  /trails/{TrailID}:
     get:
       operationId: "trails.read_one"
       tags:
         - Trails
       summary: "Read one trail"
       parameters:
-        - $ref: "#/components/parameters/trail_id"
+        - $ref: "#/components/parameters/TrailID"
       responses:
         "200":
-          description: "Successfully read one trail"
+          description: "Successfully read trail"
     put:
       tags:
         - Trails
       operationId: "trails.update"
       summary: "Update a trail"
       parameters:
-        - $ref: "#/components/parameters/trail_id"
+        - $ref: "#/components/parameters/TrailID"
       responses:
         "200":
           description: "Successfully updated trail"
@@ -164,17 +172,16 @@ paths:
           application/json:
             schema:
               x-body-name: "trail"
-              type: "object"
-              properties:
-                content:
-                  type: "string"
+              $ref: "#/components/schemas/Trail"
     delete:
       tags:
         - Trails
       operationId: "trails.delete"
       summary: "Delete a trail"
       parameters:
-        - $ref: "#/components/parameters/trail_id"
+        - $ref: "#/components/parameters/TrailID"
       responses:
         "204":
           description: "Successfully deleted trail"
+
+
