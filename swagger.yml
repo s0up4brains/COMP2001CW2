@@ -25,19 +25,60 @@ components:
         email:
           type: "string"
     Trail:
-      type: "object"
-      # required:
-      #   - TrailID
+      type: object
       properties:
-        Rating:
-          type: "number" 
-          format: "float"
+        TrailID:
+          type: integer
+          description: The unique identifier for the trail (auto-incremented).
+          readOnly: true
         DescriptionID:
-          type: "integer"
+          type: integer
+          description: The unique identifier for the description (auto-incremented).
+          readOnly: true
+        Rating:
+          type: integer
+          description: Rating for the trail.
+        description:
+          type: object
+          properties:
+            Description:
+              type: string
+              description: A detailed description of the trail.
+            DescriptionID:
+              type: integer
+              description: The ID of the description (auto-incremented).
+              readOnly: true
+            RouteID:
+              type: integer
+              description: The unique identifier for the route.
+            Trail_Location:
+              type: string
+              description: The location of the trail.
+            Trail_Name:
+              type: string
+              description: The name of the trail.
+            difficulty:
+              type: object
+              properties:
+                Difficulty:
+                  type: string
+                  description: Difficulty level of the trail.
+                DifficultyID:
+                  type: integer
+                  description: The unique identifier for difficulty level (auto-incremented).
+                  readOnly: true
+                Duration:
+                  type: integer
+                  description: Duration of the trail in hours.
+                Elevation_Gain:
+                  type: integer
+                  description: Elevation gain in meters.
+                length:
+                  type: integer
+                  description: Length of the trail in kilometers.
         user_id:
-          type: "integer"
-        Description:
-          type: "string"  
+          type: integer
+          description: The unique identifier for the user.
 
 
   parameters:

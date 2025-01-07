@@ -1,5 +1,5 @@
 # models.py
-
+import pytz
 from datetime import datetime
 from marshmallow_sqlalchemy import fields
 
@@ -7,13 +7,13 @@ from sqlalchemy import Table, Column, Integer, ForeignKey
 
 from config import db, ma
 
-    #join table trail->tags
-Trail_Tags = db.Table(
-  'Trail_Tags',
-  db.metadata,
-  db.Column('TrailID', db.Integer, db.ForeignKey('TrailID')),
-  db.Column('TagID', db.Integer, db.ForeignKey('TagID'))
-)
+#     #join table trail->tags
+# Trail_Tags = db.Table(
+#   'Trail_Tags',
+#   db.metadata,
+#   db.Column('TrailID', db.Integer, db.ForeignKey('TrailID')),
+#   db.Column('TagID', db.Integer, db.ForeignKey('TagID'))
+# )
 
 #route
 class Route(db.Model):
@@ -30,11 +30,10 @@ class RouteSchema(ma.SQLAlchemyAutoSchema):
         include_fk = True
         
 
-#difficulty
 class Difficulty(db.Model):
     __tablename__ = "Difficulty"
     __table_args__ = {'schema': 'CW2'}
-    DifficultyID = db.Column(db.Integer, primary_key=True)
+    DifficultyID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Difficulty = db.Column(db.String, nullable=False)
     length = db.Column(db.Numeric, nullable=False)
     Elevation_Gain = db.Column(db.Numeric, nullable=False)
@@ -51,23 +50,33 @@ class DifficultySchema(ma.SQLAlchemyAutoSchema):
 
 
 
-#description
+# description
 class Description(db.Model):
     __tablename__ = "Description"
     __table_args__ = {'schema': 'CW2'}
-    DescriptionID = db.Column(db.Integer, primary_key=True)
+    DescriptionID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Description = db.Column(db.String, nullable=False)
     Trail_Name = db.Column(db.String, nullable=False)
     Trail_Location = db.Column(db.String, nullable=False)
     RouteID = db.Column(db.Integer, nullable=False)
-    DifficultyID = db.Column(db.Integer, nullable=False)
-  
+    DifficultyID = db.Column(db.Integer, db.ForeignKey('CW2.Difficulty.DifficultyID'), nullable=False)
+
+    # Relationship to Difficulty
+    difficulty = db.relationship(
+        "Difficulty",
+        backref="descriptions"  # Allows access to related descriptions from a Difficulty object
+    )
+
+
 class DescriptionSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Description
         load_instance = True
         sqla_session = db.session
-        include_fk = True
+        include_relationships = True
+
+    # Nested schema for Difficulty
+    difficulty = fields.Nested("DifficultySchema")
 
 
 # tags
@@ -78,7 +87,6 @@ class Tag(db.Model):
     Tag_Name = db.Column(db.String(50))
     Tag_Type = db.Column(db.String(50))
 
-    #Trail = db.relationship('Trail', secondary = 'Trail_Tags', backref= 'Tags' )
     
 class TagSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
@@ -98,6 +106,7 @@ class User(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     password = db.Column(db.String(32))
     email = db.Column(db.String(50))
+    
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
@@ -105,28 +114,6 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         load_instance = True
         sqla_session = db.session
         include_fk = True
-
-
-# trail
-class Trail(db.Model):
-    __tablename__ = "Trail"
-    __table_args__ = {'schema': 'CW2'}
-    TrailID = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('CW2.User.id'))
-    Rating = db.Column(db.Numeric)
-    DescriptionID = db.Column(db.Integer, db.ForeignKey('CW2.Description.DescriptionID'))
-
-   # Tags = db.relationship('Tags', secondary = 'Trail_Tags', backref = 'Trail')
-
-class TrailSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Trail
-        load_instance = True
-        sqla_session = db.session
-        include_fk = True
-        
-        ma.Nested("DescriptionSchema")
-
 
 # trail_log
 class TrailLog(db.Model):
@@ -159,14 +146,38 @@ class TrailTagsSchema(ma.SQLAlchemyAutoSchema):
         sqla_session = db.session
         include_fk = True
 
-
-
-
-    trails = fields.Nested(TrailSchema, many=True)
+# trail
+class Trail(db.Model):
+    __tablename__ = "Trail"
+    __table_args__ = {'schema': 'CW2'}
+    TrailID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('CW2.User.id'))
+    Rating = db.Column(db.Numeric)
+    DescriptionID = db.Column(db.Integer, db.ForeignKey('CW2.Description.DescriptionID'))
     
+    # Relationship to Description
+    description = db.relationship(
+        "Description",
+        backref="trails",  # Allows access to related trails from a Description object
+    )
+
+
+class TrailSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Trail
+        load_instance = True
+        sqla_session = db.session
+        include_fk = True
+        
+    # Nested schema for Description
+    description = fields.Nested(DescriptionSchema)
 
 
 trail_schema = TrailSchema()
+
+description_schema = DescriptionSchema()
+descriptions_schema = DescriptionSchema(many=True)
+
 trails_schema = TrailSchema(many=True)
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
