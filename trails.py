@@ -72,5 +72,5 @@ def delete(TrailID):
         db.session.commit()
         return make_response(f"{TrailID} successfully deleted", 200)
     else:
-        abort(404, f"Trail with last name {TrailID} not found")
+        abort(404, f"Trail with TrailID {TrailID} not found")
 
